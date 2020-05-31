@@ -141,6 +141,8 @@ Konstruktionen
 Aufklärung
 Flottenbewegungen
 
+Neuigkeiten
+
 */
 
 switch (pagetype) {
@@ -206,6 +208,9 @@ switch (pagetype) {
         break;
     case "Flottenbewegungen":
         // fleet movements
+        break;
+    case "Neuigkeiten":
+        // news
         break;
     default:
         // this values is not expected... Therefore, I need an exception
