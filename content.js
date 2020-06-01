@@ -218,7 +218,11 @@ const parse_intelligence = function () {
 }
 
 // Identify type of the page
-const pagetype = document.getElementById("heading").innerText.trim();
+const heading = document.getElementById("heading");
+var pagetype;
+if (heading) {
+    pagetype = heading.innerText.trim();
+}
 
 /*
 Expected page types are:
@@ -249,87 +253,88 @@ Neuigkeiten
 
 */
 var pagecontent = {};
-switch (pagetype) {
-    case "Ranglisten":
-        // contains the list of galaxies, Allies, and players
-        break;
-    case "Galaxieansicht":
-        // contains the general galaxy overview
-        pagecontent = parse_galaxy();
-        pagecontent.type = "galaxyoverview";
-        break;
-    case "Profil bearbeiten":
-        // edit players profile
-        break;
-    case "Allianz Mitglieder":
-        // members of the ally
-        break;
-    case "Allianz Wirtschaft":
-        // economics page for the players ally
-        break;
-    case "Allianz Diplomatie":
-        // diplomatic page for the players ally
-        break;
-    case "Allianzgeschichte":
-        // history page for the players ally
-        break;
-    case "Allianzforum":
-        // message board for the players ally
-        break;
-    case "Galaxie Taktik":
-        // tactics page
-        break;
-    case "Galaxie Verwaltung":
-        // administration page
-        break;
-    case "Galaxie Wirtschaft":
-        // economics page for the players galaxy
-        break;
-    case "Galaxieboard":
-        // message board for the players galaxy
-        break;
-    case "Rohstoffe":
-        // commodities
-        break;
-    case "Handelsplatz":
-        // market place
-        break;
-    case "Produktion":
-        // ship production
-        break;
-    case "Verteidigung":
-        // defence production
-        break;
-    case "Kommunikation":
-        // communication
-        break;
-    case "Forschungen":
-        // research
-        break;
-    case "Konstruktionen":
-        // constructions
-        break;
-    case "Aufklärung":
-        // intelligence
-        pagecontent = parse_intelligence();
-        pagecontent.type = "intelligence";
-        break;
-    case "Flottenbewegungen":
-        // fleet movements
-        break;
-    case "Neuigkeiten":
-        // news
-        break;
-    default:
-        // this values is not expected... Therefore, I need an exception
-        const msg = "Unexpected pagetype: '" + pagetype + "' Please report to gn@foersterfrank.de";
-        window.alert(msg);
-        throw new Error(msg);
-        break;
+if (pagetype) {
+    switch (pagetype) {
+        case "Ranglisten":
+            // contains the list of galaxies, Allies, and players
+            break;
+        case "Galaxieansicht":
+            // contains the general galaxy overview
+            pagecontent = parse_galaxy();
+            pagecontent.type = "galaxyoverview";
+            break;
+        case "Profil bearbeiten":
+            // edit players profile
+            break;
+        case "Allianz Mitglieder":
+            // members of the ally
+            break;
+        case "Allianz Wirtschaft":
+            // economics page for the players ally
+            break;
+        case "Allianz Diplomatie":
+            // diplomatic page for the players ally
+            break;
+        case "Allianzgeschichte":
+            // history page for the players ally
+            break;
+        case "Allianzforum":
+            // message board for the players ally
+            break;
+        case "Galaxie Taktik":
+            // tactics page
+            break;
+        case "Galaxie Verwaltung":
+            // administration page
+            break;
+        case "Galaxie Wirtschaft":
+            // economics page for the players galaxy
+            break;
+        case "Galaxieboard":
+            // message board for the players galaxy
+            break;
+        case "Rohstoffe":
+            // commodities
+            break;
+        case "Handelsplatz":
+            // market place
+            break;
+        case "Produktion":
+            // ship production
+            break;
+        case "Verteidigung":
+            // defence production
+            break;
+        case "Kommunikation":
+            // communication
+            break;
+        case "Forschungen":
+            // research
+            break;
+        case "Konstruktionen":
+            // constructions
+            break;
+        case "Aufklärung":
+            // intelligence
+            pagecontent = parse_intelligence();
+            pagecontent.type = "intelligence";
+            break;
+        case "Flottenbewegungen":
+            // fleet movements
+            break;
+        case "Neuigkeiten":
+            // news
+            break;
+        default:
+            // this values is not expected... Therefore, I need an exception
+            const msg = "Unexpected pagetype: '" + pagetype + "' Please report to gn@foersterfrank.de";
+            window.alert(msg);
+            throw new Error(msg);
+            break;
+    }
+
+    console.log(pagecontent);
 }
-
-console.log(pagecontent);
-
 
 // let tables = document.getElementsByTagName("table");
 
