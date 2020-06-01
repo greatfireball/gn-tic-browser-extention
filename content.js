@@ -122,7 +122,8 @@ const get_basic_info = function () {
             "cristal": /Kristall:\s+(\S+)/.test(document.getElementsByClassName("kristall")[0].innerText.trim()) ? parseInt(RegExp.$1.replace(/\./g, ""), 10) : null,
             "metal": /Metall:\s+(\S+)/.test(document.getElementsByClassName("metall")[0].innerText.trim()) ? parseInt(RegExp.$1.replace(/\./g, ""), 10) : null,
             "points": /Punkte:\s+(\S+)/.test(document.getElementsByClassName("punkte")[0].innerText.trim()) ? parseInt(RegExp.$1.replace(/\./g, ""), 10) : null,
-        }
+        },
+        "data": []
     }
 
     if (/Willkommen\s+(.+)\s+.(\d+):(\d+).*zu Tag (\d+) der Runde (\d+)/.test(document.getElementsByClassName("welcometext")[0].innerText)) {
@@ -137,8 +138,6 @@ const get_basic_info = function () {
 
 const parse_galaxy = function () {
     var content = get_basic_info();
-    content.data = [];
-    content.type = "galaxyoverview";
 
     var nodes = document.getElementsByTagName("td"), x;
     var galaxytable, y;
@@ -162,6 +161,7 @@ const parse_galaxy = function () {
         );
     }
 
+    content.need2upload = true;
     return content;
 }
 
@@ -204,6 +204,7 @@ switch (pagetype) {
     case "Galaxieansicht":
         // contains the general galaxy overview
         pagecontent = parse_galaxy();
+        pagecontent.type = "galaxyoverview";
         break;
     case "Profil bearbeiten":
         // edit players profile
@@ -258,6 +259,7 @@ switch (pagetype) {
         break;
     case "Aufklärung":
         // intelligence
+        pagecontent.type = "intelligence";
         break;
     case "Flottenbewegungen":
         // fleet movements
@@ -274,15 +276,6 @@ switch (pagetype) {
 }
 
 console.log(pagecontent);
-
-var nodes = document.getElementsByTagName("input"), x;
-for (x = 0; x < nodes.length; x++) {
-    //console.log(x+": "); console.log(nodes[x]);
-    if (nodes[x].name === "scanresult") {
-        console.log(PHP.parse(nodes[x].value));
-    }
-}
-
 
 
 // let tables = document.getElementsByTagName("table");
