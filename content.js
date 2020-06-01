@@ -196,14 +196,14 @@ Flottenbewegungen
 Neuigkeiten
 
 */
-
+var pagecontent = {};
 switch (pagetype) {
     case "Ranglisten":
         // contains the list of galaxies, Allies, and players
         break;
     case "Galaxieansicht":
         // contains the general galaxy overview
-        console.log(parse_galaxy());
+        pagecontent = parse_galaxy();
         break;
     case "Profil bearbeiten":
         // edit players profile
@@ -273,7 +273,7 @@ switch (pagetype) {
         break;
 }
 
-console.log(pagetype);
+console.log(pagecontent);
 
 var nodes = document.getElementsByTagName("input"), x;
 for (x = 0; x < nodes.length; x++) {
