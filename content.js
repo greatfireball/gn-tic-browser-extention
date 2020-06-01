@@ -209,6 +209,7 @@ const parse_intelligence = function () {
                 } else {
                     content.data.push(PHP.parse(nodes[x].value));
                 }
+                content.need2upload = true;
             }
         }
     }
