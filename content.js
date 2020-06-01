@@ -113,6 +113,34 @@ const PHP = {
 
 // console.log("Chrome extension go");
 
+const parse_galaxy = function () {
+    var content = { "data": [] };
+
+    var nodes = document.getElementsByTagName("td"), x;
+    var galaxytable, y;
+    for (x = 0; x < nodes.length - 2; x++) {
+        if (nodes[x].innerText.trim() === "ID" && nodes[x + 1].innerText.trim() === "Rang" && nodes[x + 2].innerText.trim() === "Nick") {
+            galaxytable = nodes[x].parentElement.parentElement;
+            break;
+        }
+    }
+
+    for (x = 1; x < galaxytable.childElementCount; x++) {
+        const coords = galaxytable.children[x].children[0].innerText.split(":", 2);
+        content.data.push({
+            "galaxy": parseInt(coords[0], 10),
+            "planet": parseInt(coords[1], 10),
+            "place": parseInt(galaxytable.children[x].children[1].innerText.trim(), 10),
+            "name": galaxytable.children[x].children[2].innerText.trim(),
+            "points": parseInt(galaxytable.children[x].children[3].innerText.replace(/\./g, ""), 10),
+            "astros": parseInt(galaxytable.children[x].children[4].innerText.trim(), 10)
+        }
+        );
+    }
+
+    return content;
+}
+
 // Identify type of the page
 const pagetype = document.getElementById("heading").innerText.trim();
 
@@ -151,6 +179,7 @@ switch (pagetype) {
         break;
     case "Galaxieansicht":
         // contains the general galaxy overview
+        console.log(parse_galaxy());
         break;
     case "Profil bearbeiten":
         // edit players profile
