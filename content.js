@@ -113,8 +113,31 @@ const PHP = {
 
 // console.log("Chrome extension go");
 
+const get_basic_info = function () {
+    var content = {
+        "basic": {
+            "time": document.getElementById("uhrzeit").innerText.trim(),
+            "last_tick": /(\d+:\d+:\d+)\s+Uhr/.test(document.getElementsByClassName("lasttick")[0].innerText.trim()) ? RegExp.$1 : null,
+            "place": /Rang:\s+(\S+)/.test(document.getElementsByClassName("rang")[0].innerText.trim()) ? parseInt(RegExp.$1.replace(/\./g, ""), 10) : null,
+            "cristal": /Kristall:\s+(\S+)/.test(document.getElementsByClassName("kristall")[0].innerText.trim()) ? parseInt(RegExp.$1.replace(/\./g, ""), 10) : null,
+            "metal": /Metall:\s+(\S+)/.test(document.getElementsByClassName("metall")[0].innerText.trim()) ? parseInt(RegExp.$1.replace(/\./g, ""), 10) : null,
+            "points": /Punkte:\s+(\S+)/.test(document.getElementsByClassName("punkte")[0].innerText.trim()) ? parseInt(RegExp.$1.replace(/\./g, ""), 10) : null,
+        }
+    }
+
+    if (/Willkommen\s+(.+)\s+.(\d+):(\d+).*zu Tag (\d+) der Runde (\d+)/.test(document.getElementsByClassName("welcometext")[0].innerText)) {
+        content.basic.day = parseInt(RegExp.$4, 10);
+        content.basic.player = RegExp.$1;
+        content.basic.galaxy = parseInt(RegExp.$2, 10);
+        content.basic.planet = parseInt(RegExp.$3, 10);
+    }
+
+    return content;
+}
+
 const parse_galaxy = function () {
-    var content = { "data": [] };
+    var content = get_basic_info();
+    content.data = [];
 
     var nodes = document.getElementsByTagName("td"), x;
     var galaxytable, y;
