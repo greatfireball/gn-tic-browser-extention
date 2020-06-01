@@ -185,14 +185,31 @@ const parse_intelligence = function () {
     content.svs = {
         "own": svs[0],
         "ally": svs[1],
-        "total": svs[0]+svs[1]
+        "total": svs[0] + svs[1]
     };
 
-    nodes = document.getElementsByTagName("input");
+    // do I have a News?
+    content.scantype = null;
+    nodes = document.getElementsByTagName("td");
     for (x = 0; x < nodes.length; x++) {
-        //console.log(x+": "); console.log(nodes[x]);
-        if (nodes[x].name === "scanresult") {
-            console.log(PHP.parse(nodes[x].value));
+        // console.log(nodes[x].innerText);
+        if (/^\s*(\S+scan) Ergebnis \(Genauigkeit: (\d+)%\)/.test(nodes[x].innerText)) {
+            content.scantype = RegExp.$1;
+            break;
+        }
+    }
+
+    if (content.scantype != null) {
+        nodes = document.getElementsByTagName("input");
+        for (x = 0; x < nodes.length; x++) {
+            //console.log(x+": "); console.log(nodes[x]);
+            if (nodes[x].name === "scanresult") {
+                if (content.scantype === "Newsscan") {
+                    content.data.push(nodes[x].value);
+                } else {
+                    content.data.push(PHP.parse(nodes[x].value));
+                }
+            }
         }
     }
 
