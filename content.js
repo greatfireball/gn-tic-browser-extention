@@ -138,6 +138,7 @@ const get_basic_info = function () {
 const parse_galaxy = function () {
     var content = get_basic_info();
     content.data = [];
+    content.type = "galaxyoverview";
 
     var nodes = document.getElementsByTagName("td"), x;
     var galaxytable, y;
