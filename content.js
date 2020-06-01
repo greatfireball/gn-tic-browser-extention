@@ -165,6 +165,40 @@ const parse_galaxy = function () {
     return content;
 }
 
+const parse_intelligence = function () {
+    var content = get_basic_info();
+    content.data = [];
+
+    // get the number of scan amplifier
+    var svs = [0, 0];
+    var nodes = document.getElementsByTagName("tr"), x;
+    for (x = 0; x < nodes.length; x++) {
+        // console.log(nodes[x].innerText);
+        if (/Anzahl\s+eigener\s+Scanverst.+rker:\s+(.+)/.test(nodes[x].innerText)) {
+            const numsvs = RegExp.$1;
+            svs = numsvs.replace(/[()]/, " ").trim().split(/\s+/, 2);
+            svs[0] = (typeof svs[0] === "undefined") ? 0 : parseInt(svs[0], 10);
+            svs[1] = (typeof svs[1] === "undefined") ? 0 : parseInt(svs[1], 10);
+            break;
+        }
+    }
+    content.svs = {
+        "own": svs[0],
+        "ally": svs[1],
+        "total": svs[0]+svs[1]
+    };
+
+    nodes = document.getElementsByTagName("input");
+    for (x = 0; x < nodes.length; x++) {
+        //console.log(x+": "); console.log(nodes[x]);
+        if (nodes[x].name === "scanresult") {
+            console.log(PHP.parse(nodes[x].value));
+        }
+    }
+
+    return content;
+}
+
 // Identify type of the page
 const pagetype = document.getElementById("heading").innerText.trim();
 
@@ -259,6 +293,7 @@ switch (pagetype) {
         break;
     case "Aufklärung":
         // intelligence
+        pagecontent = parse_intelligence();
         pagecontent.type = "intelligence";
         break;
     case "Flottenbewegungen":
