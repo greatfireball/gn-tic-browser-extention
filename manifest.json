@@ -1,22 +1,25 @@
 {
     "manifest_version": 2,
-    "name": "Test",
-    "version": "1",
+    "name": "GN-TIC-Support-Extention for Chrome",
+    "version": "1.0",
     "icons": {
         "16": "icon16.png",
         "32": "icon32.png",
         "64": "icon64.png",
         "128": "icon128.png"
     },
-    "content_scripts": [
-        {
-            "matches": [
-                "https://www.galaxy-network.net/*",
-                "http://www.galaxy-network.net/*",
-                "file:///*"
-            ],
-            "all_frames": true,
-            "js": ["content.js"]
-        }
-    ]
+    "options_page": "options.html",
+    "permissions": [
+        "https://gn61.foersterfrank.info/addtodb.php",
+        "storage"
+    ],
+    "content_scripts": [{
+        "matches": [
+            "https://www.galaxy-network.net/*",
+            "http://www.galaxy-network.net/*",
+            "file:///*"
+        ],
+        "all_frames": true,
+        "js": ["content.js"]
+    }]
 }

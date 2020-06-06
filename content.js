@@ -1,7 +1,13 @@
 const PHP = {
-    stdClass: function () { },
+    stdClass: function() {},
     stringify(val) {
-        const hash = new Map([[Infinity, "d:INF;"], [-Infinity, "d:-INF;"], [NaN, "d:NAN;"], [null, "N;"], [undefined, "N;"]]);
+        const hash = new Map([
+            [Infinity, "d:INF;"],
+            [-Infinity, "d:-INF;"],
+            [NaN, "d:NAN;"],
+            [null, "N;"],
+            [undefined, "N;"]
+        ]);
         const utf8length = str => str ? encodeURI(str).match(/(%.)?./g).length : 0;
         const serializeString = (s, delim = '"') => `${utf8length(s)}:${delim[0]}${s}${delim[delim.length - 1]}`;
         let ref = 0;
@@ -18,8 +24,8 @@ const PHP = {
                 return `C:${serializeString(val.constructor.name)}:${serializeString(val.serialize(), "{}")}`;
             }
             const vals = Object.entries(val).filter(([k, v]) => typeof v !== "function");
-            return (a ? "a" : `O:${serializeString(val.constructor.name)}`)
-                + `:${vals.length}:{${vals.map(([k, v]) => serialize(a && /^\d{1,16}$/.test(k) ? +k : k, false) + serialize(v)).join("")}}`;
+            return (a ? "a" : `O:${serializeString(val.constructor.name)}`) +
+                `:${vals.length}:{${vals.map(([k, v]) => serialize(a && /^\d{1,16}$/.test(k) ? +k : k, false) + serialize(v)).join("")}}`;
         }
         return serialize(val);
     },
@@ -32,8 +38,8 @@ const PHP = {
         const specialNums = { "INF": Infinity, "-INF": -Infinity, "NAN": NaN };
 
         const kick = (msg, i = offset) => { throw new Error(`Error at ${i}: ${msg}\n${str}\n${" ".repeat(i)}^`) }
-        const read = (expected, ret) => expected === str.slice(offset, offset += expected.length) ? ret
-            : kick(`Expected '${expected}'`, offset - expected.length);
+        const read = (expected, ret) => expected === str.slice(offset, offset += expected.length) ? ret :
+            kick(`Expected '${expected}'`, offset - expected.length);
 
         function readMatch(regex, msg, terminator = ";") {
             read(":");
@@ -52,9 +58,11 @@ const PHP = {
             return numUtf8Bytes ? kick("Invalid string length", i - 2) : read(terminator, str.slice(i, offset));
         }
 
-        const create = className => !className ? {}
-            : allowedClasses[className] ? Object.create(allowedClasses[className].prototype)
-                : new { [className]: function () { } }[className]; // Create a mock class for this name
+        const create = className => !className ? {} :
+            allowedClasses[className] ? Object.create(allowedClasses[className].prototype) :
+            new {
+                [className]: function() {}
+            }[className]; // Create a mock class for this name
         const readBoolean = () => readMatch(/^[01]/, "a '0' or '1'", ";");
         const readInt = () => +readMatch(/^-?\d+/, "an integer", ";");
         const readUInt = terminator => +readMatch(/^\d+/, "an unsigned integer", terminator);
@@ -67,9 +75,9 @@ const PHP = {
 
         function readKey() {
             const typ = str[offset++];
-            return typ === "s" ? readString(";")
-                : typ === "i" ? readUInt(";")
-                    : kick("Expected 's' or 'i' as type for a key, but got ${str[offset-1]}", offset - 1);
+            return typ === "s" ? readString(";") :
+                typ === "i" ? readUInt(";") :
+                kick("Expected 's' or 'i' as type for a key, but got ${str[offset-1]}", offset - 1);
         }
 
         function readObject(obj) {
@@ -91,16 +99,20 @@ const PHP = {
         function readValue() {
             const typ = str[offset++].toLowerCase();
             const ref = values.push(null) - 1;
-            const val = typ === "n" ? read(";", null)
-                : typ === "s" ? readString(";")
-                    : typ === "b" ? readBoolean()
-                        : typ === "i" ? readInt()
-                            : typ === "d" ? readDecimal()
-                                : typ === "a" ? readArray()                            // Associative array
-                                    : typ === "o" ? readObject(create(readString()))       // Object
-                                        : typ === "c" ? readCustomObject(create(readString())) // Custom serialized object
-                                            : typ === "r" ? values[readInt()]                      // Backreference
-                                                : kick(`Unexpected type ${typ}`, offset - 1);
+            const val = typ === "n" ? read(";", null) :
+                typ === "s" ? readString(";") :
+                typ === "b" ? readBoolean() :
+                typ === "i" ? readInt() :
+                typ === "d" ? readDecimal() :
+                typ === "a" ? readArray() // Associative array
+                :
+                typ === "o" ? readObject(create(readString())) // Object
+                :
+                typ === "c" ? readCustomObject(create(readString())) // Custom serialized object
+                :
+                typ === "r" ? values[readInt()] // Backreference
+                :
+                kick(`Unexpected type ${typ}`, offset - 1);
             if (typ !== "r") values[ref] = val;
             return val;
         }
@@ -113,7 +125,25 @@ const PHP = {
 
 // console.log("Chrome extension go");
 
-const get_basic_info = function () {
+function getdate() {
+    const heute = new Date();
+
+    var str = heute.getFullYear();
+    str += "-"
+    if (heute.getMonth() + 1 < 10) {
+        str += "0";
+    }
+    str += (heute.getMonth() + 1);
+    str += "-"
+    if (heute.getDate() < 10) {
+        str += "0";
+    }
+    str += heute.getDate();
+
+    return str;
+}
+
+const get_basic_info = function() {
     var content = {
         "basic": {
             "time": document.getElementById("uhrzeit").innerText.trim(),
@@ -122,6 +152,7 @@ const get_basic_info = function () {
             "cristal": /Kristall:\s+(\S+)/.test(document.getElementsByClassName("kristall")[0].innerText.trim()) ? parseInt(RegExp.$1.replace(/\./g, ""), 10) : null,
             "metal": /Metall:\s+(\S+)/.test(document.getElementsByClassName("metall")[0].innerText.trim()) ? parseInt(RegExp.$1.replace(/\./g, ""), 10) : null,
             "points": /Punkte:\s+(\S+)/.test(document.getElementsByClassName("punkte")[0].innerText.trim()) ? parseInt(RegExp.$1.replace(/\./g, ""), 10) : null,
+            "date": getdate()
         },
         "data": []
     }
@@ -136,10 +167,11 @@ const get_basic_info = function () {
     return content;
 }
 
-const parse_galaxy = function () {
+const parse_galaxy = function() {
     var content = get_basic_info();
 
-    var nodes = document.getElementsByTagName("td"), x;
+    var nodes = document.getElementsByTagName("td"),
+        x;
     var galaxytable, y;
     for (x = 0; x < nodes.length - 2; x++) {
         if (nodes[x].innerText.trim() === "ID" && nodes[x + 1].innerText.trim() === "Rang" && nodes[x + 2].innerText.trim() === "Nick") {
@@ -157,21 +189,21 @@ const parse_galaxy = function () {
             "name": galaxytable.children[x].children[2].innerText.trim(),
             "points": parseInt(galaxytable.children[x].children[3].innerText.replace(/\./g, ""), 10),
             "astros": parseInt(galaxytable.children[x].children[4].innerText.trim(), 10)
-        }
-        );
+        });
     }
 
     content.need2upload = true;
     return content;
 }
 
-const parse_intelligence = function () {
+const parse_intelligence = function() {
     var content = get_basic_info();
     content.data = [];
 
     // get the number of scan amplifier
     var svs = [0, 0];
-    var nodes = document.getElementsByTagName("tr"), x;
+    var nodes = document.getElementsByTagName("tr"),
+        x;
     for (x = 0; x < nodes.length; x++) {
         // console.log(nodes[x].innerText);
         if (/Anzahl\s+eigener\s+Scanverst.+rker:\s+(.+)/.test(nodes[x].innerText)) {
@@ -333,7 +365,30 @@ if (pagetype) {
             break;
     }
 
-    console.log(pagecontent);
+    console.log(JSON.stringify(pagecontent));
+
+    if (pagecontent.need2upload) {
+        chrome.storage.sync.get(['location', 'apikey'], function(results) {
+            const req = new XMLHttpRequest();
+
+            apikey = results.apikey;
+            baseUrl = results.location + "/addtodb.php";
+
+            pagecontent.apikey = apikey;
+            console.log("Pagecontent API-Key: " + pagecontent.apikey + " baseUrl: " + baseUrl);
+            const urlParams = "json=" + encodeURIComponent(JSON.stringify(pagecontent));
+
+            req.open("POST", baseUrl, true);
+            req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            req.send(urlParams);
+
+            req.onreadystatechange = function() { // Call a function when the state changes.
+                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                    console.log("Got response 200!");
+                }
+            }
+        });
+    }
 }
 
 // let tables = document.getElementsByTagName("table");
