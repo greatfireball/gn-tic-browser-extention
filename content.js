@@ -201,16 +201,16 @@ const parse_intelligence = function() {
     content.data = [];
 
     // get the number of scan amplifier
-    var svs = [0, 0];
+    let svs = [0, 0];
     var nodes = document.getElementsByTagName("tr"),
         x;
     for (x = 0; x < nodes.length; x++) {
         // console.log(nodes[x].innerText);
-        if (/Anzahl\s+eigener\s+Scanverst.+rker:\s+(.+)/.test(nodes[x].innerText)) {
-            const numsvs = RegExp.$1;
-            svs = numsvs.replace(/[()]/, " ").trim().split(/\s+/, 2);
-            svs[0] = (typeof svs[0] === "undefined") ? 0 : parseInt(svs[0], 10);
-            svs[1] = (typeof svs[1] === "undefined") ? 0 : parseInt(svs[1], 10);
+        if (/Anzahl\s+eigener\s+Scanverst.+rker:\s+(\d+)\s*\(*\s*\+*\s*(\d*)/.test(nodes[x].innerText)) {
+            svs[0] = parseInt(RegExp.$1, 10);
+            svs[1] = parseInt(RegExp.$2, 10);
+            svs[0] = (isNaN(svs[0])) ? 0 : svs[0];
+            svs[1] = (isNaN(svs[1])) ? 0 : svs[1];
             break;
         }
     }
