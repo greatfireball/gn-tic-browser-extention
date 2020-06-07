@@ -196,6 +196,22 @@ const parse_galaxy = function() {
     return content;
 }
 
+const gn_scan_name_to_type = function(gntypestring) {
+    if (gntypestring === "sektor") {
+        return 0;
+    } else if (gntypestring === "mili") {
+        return 2;
+    } else if (gntypestring === "einheit") {
+        return 1;
+    } else if (gntypestring === "gesch") {
+        return 3;
+    } else if (gntypestring === "news") {
+        return 4;
+    } else {
+        return -1;
+    }
+}
+
 const parse_intelligence = function() {
     console.log("Starting to parse scan page...");
     var content = get_basic_info();
@@ -248,7 +264,7 @@ const parse_intelligence = function() {
             };
             blockdata.galaxy = parseInt(urlParams.get('c1'), 10);
             blockdata.planet = parseInt(urlParams.get('c2'), 10);
-            blockdata.type = urlParams.get('typ');
+            blockdata.type = gn_scan_name_to_type(urlParams.get('typ'));
 
             content.data.push(blockdata);
             content.need2upload = true;
