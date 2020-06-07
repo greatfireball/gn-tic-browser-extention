@@ -197,6 +197,7 @@ const parse_galaxy = function() {
 }
 
 const parse_intelligence = function() {
+    console.log("Starting to parse scan page...");
     var content = get_basic_info();
     content.data = [];
 
@@ -231,7 +232,31 @@ const parse_intelligence = function() {
         }
     }
 
-    if (content.scantype != null) {
+    // check for scanblock
+    content.block = false;
+    nodes = document.getElementsByClassName("msgred");
+    for (x = 0; x < nodes.length; x++) {
+        // console.log(nodes[x].innerText);
+        if (/Leider konnten unsere Scanner keine brauchbaren Resultate liefern, Kommandant./.test(nodes[x].innerText)) {
+            content.block = true;
+
+            var urlParams = new URLSearchParams(window.location.href);
+            var blockdata = {
+                'galaxy': null,
+                'planet': null,
+                'type': null
+            };
+            blockdata.galaxy = parseInt(urlParams.get('c1'), 10);
+            blockdata.planet = parseInt(urlParams.get('c2'), 10);
+            blockdata.type = urlParams.get('typ');
+
+            content.data.push(blockdata);
+            content.need2upload = true;
+            break;
+        }
+    }
+
+    if (content.scantype != null && content.block === false) {
         nodes = document.getElementsByTagName("input");
         for (x = 0; x < nodes.length; x++) {
             //console.log(x+": "); console.log(nodes[x]);
