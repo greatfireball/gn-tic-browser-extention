@@ -155,7 +155,7 @@ const get_basic_info = function() {
             "date": getdate()
         },
         "data": [],
-        "version": "1.5"
+        "version": "1.6"
     }
 
     if (/Willkommen\s+(.+)\s+.(\d+):(\d+).*zu Tag (\d+) der Runde (\d+)/.test(document.getElementsByClassName("welcometext")[0].innerText)) {
@@ -257,7 +257,7 @@ const parse_intelligence = function() {
         if (/Leider konnten unsere Scanner keine brauchbaren Resultate liefern, Kommandant./.test(nodes[x].innerText)) {
             content.block = true;
 
-            var urlParams = new URLSearchParams(window.location.href);
+            var urlParams = new URLSearchParams(document.URL);
             var blockdata = {
                 'galaxy': null,
                 'planet': null,
@@ -266,6 +266,13 @@ const parse_intelligence = function() {
             blockdata.galaxy = parseInt(urlParams.get('c1'), 10);
             blockdata.planet = parseInt(urlParams.get('c2'), 10);
             blockdata.type = gn_scan_name_to_type(urlParams.get('typ'));
+
+            console.log("Found block" + JSON.stringify({
+                'document-URL': document.URL,
+                'node': nodes[x],
+                'urlparam': urlParams.entries(),
+                'blockdata': blockdata
+            }));
 
             content.data.push(blockdata);
             content.need2upload = true;
