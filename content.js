@@ -155,7 +155,7 @@ const get_basic_info = function() {
             "date": getdate()
         },
         "data": [],
-        "version": "1.6"
+        "version": "1.6.1"
     }
 
     if (/Willkommen\s+(.+)\s+.(\d+):(\d+).*zu Tag (\d+) der Runde (\d+)/.test(document.getElementsByClassName("welcometext")[0].innerText)) {
@@ -257,7 +257,12 @@ const parse_intelligence = function() {
         if (/Leider konnten unsere Scanner keine brauchbaren Resultate liefern, Kommandant./.test(nodes[x].innerText)) {
             content.block = true;
 
-            var urlParams = new URLSearchParams(document.URL);
+            var urlParams;
+            if (top["mainFrame"] === undefined) {
+                urlParams = new URLSearchParams(document.URL);
+            } else {
+                urlParams = new URLSearchParams(top["mainFrame"].location.href);
+            }
             var blockdata = {
                 'galaxy': null,
                 'planet': null,
