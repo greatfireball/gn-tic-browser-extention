@@ -155,7 +155,7 @@ const get_basic_info = function() {
             "date": getdate()
         },
         "data": [],
-        "version": "1.7.0"
+        "version": "1.7.1"
     }
 
     if (/Willkommen\s+(.+)\s+.(\d+):(\d+).*zu Tag (\d+) der Runde (\d+)/.test(document.getElementsByClassName("welcometext")[0].innerText)) {
@@ -214,8 +214,23 @@ const gn_scan_name_to_type = function(gntypestring) {
 }
 
 const parse_news = function(news) {
+    // get general information
+    var returnval = { 'typ': 'news' };
+    returnval.entries = Array();
+
+    var tablerows = news.getElementsByTagName("table")[0].firstElementChild.children;
+    if (/^Newsscan.+Ergebnis.+Genauigkeit:\s+(\d+)/.test(tablerows[0].innerText.trim())) {
+        returnval.wahr = parseInt(RegExp.$1, 10);
+    }
+    if (/^Name:\s+(.+)$/.test(tablerows[1].innerText.trim())) {
+        returnval.nick = RegExp.$1;
+    }
+    if (/^Koordinaten:\s+(\d+):(\d+)$/.test(tablerows[2].innerText.trim())) {
+        returnval.galid = parseInt(RegExp.$1, 10);
+        returnval.placeid = parseInt(RegExp.$2, 10);
+    }
+
     var tablerows = news.getElementsByTagName("table")[1].firstElementChild.children;
-    var entries = Array();
 
     for (var i = 0; i < tablerows.length; i += 2) {
         var newseintrag = { t: null, title: null, content: null };
@@ -224,9 +239,9 @@ const parse_news = function(news) {
         newseintrag.title = txt.substr(22, txt.length);
         newseintrag.content = tablerows[i + 1].innerText.trim();
 
-        entries.push(newseintrag);
+        returnval.entries.push(newseintrag);
     }
-    return entries;
+    return returnval;
 }
 
 const parse_intelligence = function() {
