@@ -155,7 +155,7 @@ const get_basic_info = function() {
             "date": getdate()
         },
         "data": [],
-        "version": "1.6.1"
+        "version": "1.7.0"
     }
 
     if (/Willkommen\s+(.+)\s+.(\d+):(\d+).*zu Tag (\d+) der Runde (\d+)/.test(document.getElementsByClassName("welcometext")[0].innerText)) {
@@ -211,6 +211,22 @@ const gn_scan_name_to_type = function(gntypestring) {
     } else {
         return -1;
     }
+}
+
+const parse_news = function(news) {
+    var tablerows = news.getElementsByTagName("table")[1].firstElementChild.children;
+    var entries = Array();
+
+    for (var i = 0; i < tablerows.length; i += 2) {
+        var newseintrag = { t: null, title: null, content: null };
+        var txt = tablerows[i].innerText.trim();
+        newseintrag.t = txt.substr(1, 19); //[03/05-2016 09:15:13]
+        newseintrag.title = txt.substr(22, txt.length);
+        newseintrag.content = tablerows[i + 1].innerText.trim();
+
+        entries.push(newseintrag);
+    }
+    return entries;
 }
 
 const parse_intelligence = function() {
@@ -291,7 +307,8 @@ const parse_intelligence = function() {
             //console.log(x+": "); console.log(nodes[x]);
             if (nodes[x].name === "scanresult") {
                 if (content.scantype === "Newsscan") {
-                    content.data.push(nodes[x].value);
+                    content.data.push(parse_news(nodes[x].value));
+                    break;
                 } else {
                     content.data.push(PHP.parse(nodes[x].value));
                 }
