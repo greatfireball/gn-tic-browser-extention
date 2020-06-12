@@ -155,7 +155,7 @@ const get_basic_info = function() {
             "date": getdate()
         },
         "data": [],
-        "version": "1.7.1"
+        "version": "1.7.2"
     }
 
     if (/Willkommen\s+(.+)\s+.(\d+):(\d+).*zu Tag (\d+) der Runde (\d+)/.test(document.getElementsByClassName("welcometext")[0].innerText)) {
@@ -222,10 +222,10 @@ const parse_news = function(news) {
     if (/^Newsscan.+Ergebnis.+Genauigkeit:\s+(\d+)/.test(tablerows[0].innerText.trim())) {
         returnval.wahr = parseInt(RegExp.$1, 10);
     }
-    if (/^Name:\s+(.+)$/.test(tablerows[1].innerText.trim())) {
+    if (/^Name:\s+(.+)/.test(tablerows[1].innerText.trim())) {
         returnval.nick = RegExp.$1;
     }
-    if (/^Koordinaten:\s+(\d+):(\d+)$/.test(tablerows[2].innerText.trim())) {
+    if (/Koordinaten:\s*(\d+):(\d+)/.test(tablerows[2].innerText.trim())) {
         returnval.galid = parseInt(RegExp.$1, 10);
         returnval.placeid = parseInt(RegExp.$2, 10);
     }
@@ -321,13 +321,16 @@ const parse_intelligence = function() {
         for (x = 0; x < nodes.length; x++) {
             //console.log(x+": "); console.log(nodes[x]);
             if (nodes[x].name === "scanresult") {
-                if (content.scantype === "Newsscan") {
-                    content.data.push(parse_news(nodes[x].value));
+                if (content.scantype === "Newsscan" && content.data.length == 0) {
+                    var el = document.createElement('html');
+                    el.innerHTML = nodes[x].value;
+                    content.data.push(parse_news(el));
+                    content.need2upload = true;
                     break;
                 } else {
                     content.data.push(PHP.parse(nodes[x].value));
+                    content.need2upload = true;
                 }
-                content.need2upload = true;
             }
         }
     }
