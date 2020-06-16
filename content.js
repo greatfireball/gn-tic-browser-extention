@@ -155,7 +155,7 @@ const get_basic_info = function() {
             "date": getdate()
         },
         "data": [],
-        "version": "1.7.2"
+        "version": "1.7.3"
     }
 
     if (/Willkommen\s+(.+)\s+.(\d+):(\d+).*zu Tag (\d+) der Runde (\d+)/.test(document.getElementsByClassName("welcometext")[0].innerText)) {
@@ -171,29 +171,72 @@ const get_basic_info = function() {
 const parse_galaxy = function() {
     var content = get_basic_info();
 
-    var nodes = document.getElementsByTagName("td"),
-        x;
-    var galaxytable, y;
-    for (x = 0; x < nodes.length - 2; x++) {
-        if (nodes[x].innerText.trim() === "ID" && nodes[x + 1].innerText.trim() === "Rang" && nodes[x + 2].innerText.trim() === "Nick") {
-            galaxytable = nodes[x].parentElement.parentElement;
-            break;
+    var nodes = document.getElementsByTagName("tr");
+
+    let membertable, diplotable;
+    for (var x = 0; x < nodes.length; x++) {
+        if (/Allianzangehörigkeit/.test(nodes[x].innerText)) {
+            console.log("Found diplotable");
+            diplotable = nodes[x].parentElement;
+        }
+    }
+    for (var x = 0; x < nodes.length; x++) {
+        if (/ID\s+Rang\s+Nick\s+Punkte\s+Größe\s+Scans/.test(nodes[x].innerText)) {
+            console.log("Found member table");
+            membertable = nodes[x].parentElement;
         }
     }
 
-    for (x = 1; x < galaxytable.childElementCount; x++) {
-        const coords = galaxytable.children[x].children[0].innerText.split(":", 2);
-        content.data.push({
-            "galaxy": parseInt(coords[0], 10),
-            "planet": parseInt(coords[1], 10),
-            "place": parseInt(galaxytable.children[x].children[1].innerText.trim(), 10),
-            "name": galaxytable.children[x].children[2].innerText.trim(),
-            "points": parseInt(galaxytable.children[x].children[3].innerText.replace(/\./g, ""), 10),
-            "astros": parseInt(galaxytable.children[x].children[4].innerText.trim(), 10)
-        });
+    var galaxy_view = {
+        'id': null,
+        'member': [],
+        'diplo': {
+            'ally': null,
+            'allies': null,
+            'nonattack': null,
+            'warwith': null
+        }
+    };
+
+    galaxy_view.id = parseInt(document.getElementById('uniId').value.trim(), 10);
+
+    if (diplotable) {
+        for (var x = 0; x < diplotable.childElementCount; x++) {
+            if (/Allianzangehörigkeit:/.test(diplotable.children[x].children[0].innerText)) {
+                console.log(diplotable.children[x].children[1].innerText.trim());
+                galaxy_view.diplo.ally = diplotable.children[x].children[1].innerText.trim();
+                continue;
+            } else if (/Verbündet mit:/.test(diplotable.children[x].children[0].innerText)) {
+                galaxy_view.diplo.allies = diplotable.children[x].children[1].innerText.trim().split(' | ');
+                continue;
+            } else if (/Nicht-Angriffs-Pakt mit:/.test(diplotable.children[x].children[0].innerText)) {
+                galaxy_view.diplo.nonattack = diplotable.children[x].children[1].innerText.trim().split(' | ');
+                continue;
+            } else if (/Im Krieg mit:/.test(diplotable.children[x].children[0].innerText)) {
+                galaxy_view.diplo.warwith = diplotable.children[x].children[1].innerText.trim().split(' | ');
+                continue;
+            }
+        }
+        content.need2upload = true;
     }
 
-    content.need2upload = true;
+    if (membertable) {
+        for (var x = 1; x < membertable.childElementCount; x++) {
+            const coords = membertable.children[x].children[0].innerText.split(":", 2);
+
+            galaxy_view.member.push({
+                "galaxy": parseInt(coords[0], 10),
+                "planet": parseInt(coords[1], 10),
+                "place": parseInt(membertable.children[x].children[1].innerText.trim(), 10),
+                "name": membertable.children[x].children[2].innerText.trim(),
+                "points": parseInt(membertable.children[x].children[3].innerText.replace(/\./g, ""), 10),
+                "astros": parseInt(membertable.children[x].children[4].innerText.trim(), 10)
+            });
+        }
+        content.need2upload = true;
+    }
+
+    content.data.push(galaxy_view);
     return content;
 }
 
