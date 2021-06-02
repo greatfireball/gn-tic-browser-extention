@@ -155,7 +155,7 @@ const get_basic_info = function() {
             "date": getdate()
         },
         "data": [],
-        "version": "1.7.3"
+        "version": "1.7.6"
     }
 
     if (/Willkommen\s+(.+)\s+.(\d+):(\d+).*zu Tag (\d+) der Runde (\d+)/.test(document.getElementsByClassName("welcometext")[0].innerText)) {
