@@ -16,8 +16,6 @@
     ],
     "content_scripts": [{
         "matches": [
-            "https://www.galaxy-network.net/*",
-            "http://www.galaxy-network.net/*",
             "https://www.galaxy-network.de/*",
             "http://www.galaxy-network.de/*",
             "https://galaxy-network.de/*",
