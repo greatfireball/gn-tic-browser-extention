@@ -12,6 +12,8 @@
     "permissions": [
         "https://gn61.foersterfrank.info/addtodb.php",
         "http://gn61.foersterfrank.info/addtodb.php",
+        "https://gntic63.foersterfrank.info/addtodb.php",
+        "http://gntic63.foersterfrank.info/addtodb.php",
         "storage"
     ],
     "content_scripts": [{

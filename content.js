@@ -381,6 +381,98 @@ const parse_intelligence = function() {
     return content;
 }
 
+function parse_tactics() {
+    var content = get_basic_info();
+
+    const parseFlotten = function(dat) {
+        var y = [];
+        for (var j = 0; j < dat.length; j++) {
+            var div = document.createElement("div");
+            div.innerHTML = dat[j];
+            var txt = div.textContent.trim();
+            if (txt.length > 0)
+                y.push(txt);
+        }
+        return y;
+    }
+
+    const convertRemainingTime = function(input) {
+        var result;
+        //minute format
+        if (input.includes('Min')) {
+            result = Math.ceil(parseInt(input.replaceAll('Min').trim()) / 15.0);
+        } else if (input.includes(':')) {
+            input = input.split(':');
+            if (input.length == 3) {
+                //with seconds
+                result = Math.ceil((parseInt(input[0]) * 60 + parseInt(input[1]) + Math.ceil(parseInt(input[2]))) / 15.0);
+            } else {
+                //without seconds
+                result = Math.ceil((parseInt(input[0]) * 60 + parseInt(input[1])) / 15.0);
+            }
+            //roundet to 0, this is wrong.
+            if (result === 0) {
+                result = 1;
+            }
+        } else {
+            //tick format
+            result = parseInt(input);
+        }
+
+        return result;
+    }
+
+    const tables = document.getElementsByTagName("tbody");
+
+    for (var x = 0; x < tables.length; x++) {
+        if (/^Sektor\s+Kommandant\s+Greift\s+an\s+Zeit\s+Verteidigt\s+Zeit\s+Wird\s+angegriffen\s+von\s+Zeit\s+Wird\s+verteidigt\s+von\s+Zeit$/.test(tables[x].children[0].innerText.trim())) {
+            fleettable = tables[x];
+            break;
+        }
+    }
+
+    const rows = fleettable.getElementsByTagName("tr");
+    for (var x = 1; x < rows.length - 1; x++) {
+        var cells = rows[x].getElementsByTagName("td");
+
+        var member = {
+            koords: cells[0].textContent.trim().split(':'),
+            name: cells[1].textContent.replace('*', '').trim(),
+            greift_an: parseFlotten(cells[2].innerHTML.split('<br>')),
+            greift_an_zeit: parseFlotten(cells[3].innerHTML.split('<br>')),
+            verteidigt: parseFlotten(cells[4].innerHTML.split('<br>')),
+            verteidigt_zeit: parseFlotten(cells[5].innerHTML.split('<br>')),
+            angegriffen_von: parseFlotten(cells[6].innerHTML.split('<br>')),
+            angegriffen_von_zeit: parseFlotten(cells[7].innerHTML.split('<br>')),
+            verteidigt_von: parseFlotten(cells[8].innerHTML.split('<br>')),
+            verteidigt_von_zeit: parseFlotten(cells[9].innerHTML.split('<br>')),
+        };
+
+        //time conversion
+        for (var j = 0; j < member.verteidigt_zeit.length; j++) {
+            member.verteidigt_zeit[j] = convertRemainingTime(member.verteidigt_zeit[j]);
+            send = true;
+        }
+        for (var j = 0; j < member.verteidigt_von_zeit.length; j++) {
+            member.verteidigt_von_zeit[j] = convertRemainingTime(member.verteidigt_von_zeit[j]);
+            send = true;
+        }
+        for (var j = 0; j < member.angegriffen_von_zeit.length; j++) {
+            member.angegriffen_von_zeit[j] = convertRemainingTime(member.angegriffen_von_zeit[j]);
+            send = true;
+        }
+        for (var j = 0; j < member.greift_an_zeit.length; j++) {
+            member.greift_an_zeit[j] = convertRemainingTime(member.greift_an_zeit[j]);
+            send = true;
+        }
+
+        content.data.push(member);
+    }
+
+    content.need2upload = true;
+    return content;
+}
+
 // Identify type of the page
 const heading = document.getElementById("heading");
 var pagetype;
@@ -447,6 +539,8 @@ if (pagetype) {
             break;
         case "Galaxie Taktik":
             // tactics page
+            pagecontent = parse_tactics();
+            pagecontent.type = "galaxytactics";
             break;
         case "Galaxie Verwaltung":
             // administration page
